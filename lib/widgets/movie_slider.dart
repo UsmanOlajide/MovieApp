@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MovieSlider extends StatelessWidget {
   const MovieSlider(
-      {super.key, required this.categoryName, required this.snapshot});
+      {super.key, required this.categoryName, required this.movies});
 
   final String categoryName;
-  final AsyncSnapshot<List<Movie>> snapshot;
+  final List<Movie> movies;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class MovieSlider extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) {
                           return MovieDetailsScreen(
-                            movie: snapshot.data![index],
+                            movie: movies[index],
                           );
                         },
                       ),
@@ -54,7 +54,7 @@ class MovieSlider extends StatelessWidget {
                       ),
                       image: DecorationImage(
                         image: NetworkImage(
-                            '${Constants.imagePath}${snapshot.data![index].posterPath}'),
+                            '${Constants.imagePath}${movies[index].posterPath}'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -62,7 +62,7 @@ class MovieSlider extends StatelessWidget {
                 ),
               );
             },
-            itemCount: snapshot.data!.length,
+            itemCount: movies.length,
           ),
         ),
       ],

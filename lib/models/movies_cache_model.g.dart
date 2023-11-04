@@ -55,7 +55,7 @@ const MovieCacheModelSchema = CollectionSchema(
     r'voteAverage': PropertySchema(
       id: 7,
       name: r'voteAverage',
-      type: IsarType.long,
+      type: IsarType.double,
     )
   },
   estimateSize: _movieCacheModelEstimateSize,
@@ -63,7 +63,21 @@ const MovieCacheModelSchema = CollectionSchema(
   deserialize: _movieCacheModelDeserialize,
   deserializeProp: _movieCacheModelDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'originalTitle': IndexSchema(
+      id: -6929641275796492192,
+      name: r'originalTitle',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'originalTitle',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _movieCacheModelGetId,
@@ -100,7 +114,7 @@ void _movieCacheModelSerialize(
   writer.writeString(offsets[4], object.posterPath);
   writer.writeString(offsets[5], object.releaseDate);
   writer.writeString(offsets[6], object.title);
-  writer.writeLong(offsets[7], object.voteAverage);
+  writer.writeDouble(offsets[7], object.voteAverage);
 }
 
 MovieCacheModel _movieCacheModelDeserialize(
@@ -117,7 +131,7 @@ MovieCacheModel _movieCacheModelDeserialize(
     posterPath: reader.readStringOrNull(offsets[4]) ?? '',
     releaseDate: reader.readStringOrNull(offsets[5]) ?? '',
     title: reader.readStringOrNull(offsets[6]) ?? '',
-    voteAverage: reader.readLongOrNull(offsets[7]) ?? 0,
+    voteAverage: reader.readDoubleOrNull(offsets[7]) ?? 0,
   );
   object.id = id;
   return object;
@@ -145,7 +159,7 @@ P _movieCacheModelDeserializeProp<P>(
     case 6:
       return (reader.readStringOrNull(offset) ?? '') as P;
     case 7:
-      return (reader.readLongOrNull(offset) ?? 0) as P;
+      return (reader.readDoubleOrNull(offset) ?? 0) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -162,6 +176,63 @@ List<IsarLinkBase<dynamic>> _movieCacheModelGetLinks(MovieCacheModel object) {
 void _movieCacheModelAttach(
     IsarCollection<dynamic> col, Id id, MovieCacheModel object) {
   object.id = id;
+}
+
+extension MovieCacheModelByIndex on IsarCollection<MovieCacheModel> {
+  Future<MovieCacheModel?> getByOriginalTitle(String originalTitle) {
+    return getByIndex(r'originalTitle', [originalTitle]);
+  }
+
+  MovieCacheModel? getByOriginalTitleSync(String originalTitle) {
+    return getByIndexSync(r'originalTitle', [originalTitle]);
+  }
+
+  Future<bool> deleteByOriginalTitle(String originalTitle) {
+    return deleteByIndex(r'originalTitle', [originalTitle]);
+  }
+
+  bool deleteByOriginalTitleSync(String originalTitle) {
+    return deleteByIndexSync(r'originalTitle', [originalTitle]);
+  }
+
+  Future<List<MovieCacheModel?>> getAllByOriginalTitle(
+      List<String> originalTitleValues) {
+    final values = originalTitleValues.map((e) => [e]).toList();
+    return getAllByIndex(r'originalTitle', values);
+  }
+
+  List<MovieCacheModel?> getAllByOriginalTitleSync(
+      List<String> originalTitleValues) {
+    final values = originalTitleValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'originalTitle', values);
+  }
+
+  Future<int> deleteAllByOriginalTitle(List<String> originalTitleValues) {
+    final values = originalTitleValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'originalTitle', values);
+  }
+
+  int deleteAllByOriginalTitleSync(List<String> originalTitleValues) {
+    final values = originalTitleValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'originalTitle', values);
+  }
+
+  Future<Id> putByOriginalTitle(MovieCacheModel object) {
+    return putByIndex(r'originalTitle', object);
+  }
+
+  Id putByOriginalTitleSync(MovieCacheModel object, {bool saveLinks = true}) {
+    return putByIndexSync(r'originalTitle', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByOriginalTitle(List<MovieCacheModel> objects) {
+    return putAllByIndex(r'originalTitle', objects);
+  }
+
+  List<Id> putAllByOriginalTitleSync(List<MovieCacheModel> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'originalTitle', objects, saveLinks: saveLinks);
+  }
 }
 
 extension MovieCacheModelQueryWhereSort
@@ -240,6 +311,51 @@ extension MovieCacheModelQueryWhere
         upper: upperId,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterWhereClause>
+      originalTitleEqualTo(String originalTitle) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'originalTitle',
+        value: [originalTitle],
+      ));
+    });
+  }
+
+  QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterWhereClause>
+      originalTitleNotEqualTo(String originalTitle) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'originalTitle',
+              lower: [],
+              upper: [originalTitle],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'originalTitle',
+              lower: [originalTitle],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'originalTitle',
+              lower: [originalTitle],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'originalTitle',
+              lower: [],
+              upper: [originalTitle],
+              includeUpper: false,
+            ));
+      }
     });
   }
 }
@@ -1175,49 +1291,58 @@ extension MovieCacheModelQueryFilter
   }
 
   QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterFilterCondition>
-      voteAverageEqualTo(int value) {
+      voteAverageEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'voteAverage',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterFilterCondition>
       voteAverageGreaterThan(
-    int value, {
+    double value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'voteAverage',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterFilterCondition>
       voteAverageLessThan(
-    int value, {
+    double value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'voteAverage',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<MovieCacheModel, MovieCacheModel, QAfterFilterCondition>
       voteAverageBetween(
-    int lower,
-    int upper, {
+    double lower,
+    double upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -1226,6 +1351,7 @@ extension MovieCacheModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -1588,7 +1714,8 @@ extension MovieCacheModelQueryProperty
     });
   }
 
-  QueryBuilder<MovieCacheModel, int, QQueryOperations> voteAverageProperty() {
+  QueryBuilder<MovieCacheModel, double, QQueryOperations>
+      voteAverageProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'voteAverage');
     });

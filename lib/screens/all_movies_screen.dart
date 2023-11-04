@@ -1,13 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cineverse/widgets/loaded_movies.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:cineverse/models/movie.dart';
+
 import '../services/networking.dart';
 import '../widgets/movie_slider.dart';
-import '../widgets/trending_movies.dart';
+import '../widgets/popular_movies.dart';
 
 class AllMoviesScreen extends StatelessWidget {
   const AllMoviesScreen({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -37,70 +40,66 @@ class AllMoviesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            FutureBuilder(
-              future: networking.getPopularMoviesList(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(snapshot.error.toString()),
-                  );
-                  // print(snapshot.error.toString());
-                }
-                if (snapshot.hasData) {
-                  return TrendingMovies(snapshot: snapshot);
-                  // print('Has Data');
-                }
-                return const Center(
-                  child: Text('loading...'),
-                );
-              },
+            _ItemFutureBuilder(
+              future: PopularMoviesManager().getPopularMovies(),
+              initialData: PopularMoviesManager().movies,
+              onDataAvailable: (movies) => PopularMovies(movies: movies),
             ),
+
             const SizedBox(height: 30),
-            FutureBuilder(
-              future: networking.getTopRatedMoviesList(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(snapshot.error.toString()),
-                  );
-                }
-                if (snapshot.hasData) {
-                  return MovieSlider(
-                    categoryName: 'Top Rated Movies',
-                    snapshot: snapshot,
-                  );
-                }
-                return const Center(
-                  child: Text('loading...'),
-                );
-              },
+            _ItemFutureBuilder(
+              future: TopRatedMoviesManager().getTopRatedMovies(),
+              initialData: TopRatedMoviesManager().movies,
+              onDataAvailable: (movies) =>
+                  MovieSlider(categoryName: 'Top Rated Movies', movies: movies),
             ),
+
             const SizedBox(height: 20),
-            FutureBuilder(
-              future: networking.getUpcomingMoviesList(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(snapshot.error.toString()),
-                  );
-                }
-                if (snapshot.hasData) {
-                  return MovieSlider(
-                    categoryName: 'Upcoming Movies',
-                    snapshot: snapshot,
-                  );
-                }
-                return const Center(
-                  child: Text('loading...'),
-                );
-              },
+            _ItemFutureBuilder(
+              future: UpcomingMoviesManager().getTopRatedMovies(),
+              initialData: UpcomingMoviesManager().movies,
+              onDataAvailable: (movies) =>
+                  MovieSlider(categoryName: 'Upcoming Movies', movies: movies),
             ),
-            // const MovieSlider(
-            //   categoryName: 'Upcoming Movies',
-            // )
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ItemFutureBuilder extends StatelessWidget {
+  const _ItemFutureBuilder(
+      {Key? key,
+      required this.future,
+      required this.onDataAvailable,
+      this.initialData})
+      : super(key: key);
+
+  final Future<List<Movie>> future;
+  final Widget Function(List<Movie>) onDataAvailable;
+  final List<Movie>? initialData;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: future,
+      initialData: initialData,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(snapshot.error.toString()),
+          );
+          // print(snapshot.error.toString());
+        }
+        if (snapshot.hasData) {
+          return onDataAvailable(snapshot.data!);
+          // print('Has Data');
+        }
+        return const Center(
+          child: Text('loading...'),
+        );
+      },
     );
   }
 }

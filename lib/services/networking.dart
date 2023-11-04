@@ -40,6 +40,7 @@ class Networking {
     final List<dynamic> decodedData = json.decode(data)['results'];
 
     return decodedData.map((movie) => Movie.fromJson(movie)).toList();
+
   }
 
   Future<List<Movie>> getTopRatedMoviesList() async {

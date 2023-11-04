@@ -4,27 +4,28 @@ import 'package:cineverse/models/movie.dart';
 import 'package:cineverse/screens/movie_details_screen.dart';
 import 'package:flutter/material.dart';
 
-class TrendingMovies extends StatelessWidget {
-  const TrendingMovies({
+class PopularMovies extends StatelessWidget {
+  const PopularMovies({
     super.key,
-    required this.snapshot,
+    required this.movies,
   });
 
-  final AsyncSnapshot<List<Movie>> snapshot;
+  final List<Movie> movies;
   // final List<Movie> movies;
 
   @override
   Widget build(BuildContext context) {
+    
     return CarouselSlider.builder(
       itemBuilder: (ctx, index, pageIndex) {
-        final movie = snapshot.data![index];
+        final movie = movies[index];
         return InkWell(
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) {
                   return MovieDetailsScreen(
-                    movie: snapshot.data![index],
+                    movie: movie,
                   );
                 },
               ),
@@ -36,7 +37,7 @@ class TrendingMovies extends StatelessWidget {
               height: 300,
               width: 200,
               child: Image.network(
-                '${Constants.imagePath}${snapshot.data![index].posterPath}',
+                '${Constants.imagePath}${movie.posterPath}',
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
               ),
@@ -52,7 +53,7 @@ class TrendingMovies extends StatelessWidget {
         autoPlayCurve: Curves.fastOutSlowIn,
         autoPlayInterval: const Duration(seconds: 2),
       ),
-      itemCount: snapshot.data!.length,
+      itemCount: movies.length,
     );
   }
 }

@@ -5,7 +5,9 @@ import 'package:path_provider/path_provider.dart';
 import '../models/movie.dart';
 
 class CacheServices {
+  // CacheServices._internal();
   late Future<Isar> _isar;
+  List<Movie>? movies;
 
   static final CacheServices _singleton = CacheServices._internal();
 
@@ -31,7 +33,9 @@ class CacheServices {
     //using movieCacheModel because I don't want to mess with the main movie object
     final cachedMovies = await isar.movieCacheModels.where().findAll();
     // return cachedMovies.map(Movie.fromCache).toList();
-    return cachedMovies.map(Movie.cacheMovieToMovie).toList();
+    final newMoviesList = cachedMovies.map(Movie.cacheMovieToMovie).toList();
+    movies = newMoviesList;
+    return newMoviesList;
   }
 
   Future<void> toggleFavourite(Movie movie) async {
@@ -61,6 +65,11 @@ class CacheServices {
         .distinctByModelId()
         .modelIdProperty()
         .findAll();
+    print('*************************************');
+    print(modelIds);
+    print(id);
+    print(modelIds.contains(id));
+    print('*************************************');
     if (modelIds.contains(id)) return true;
     return false;
   }

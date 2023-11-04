@@ -21,7 +21,7 @@ class Movie {
   final String overview;
   final String posterPath;
   final String releaseDate;
-  final num voteAverage;
+  final double voteAverage;
 
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
@@ -33,7 +33,7 @@ class Movie {
       posterPath: json["poster_path"],
       releaseDate: json["release_date"],
       // voteAverage: json["vote_average"],
-      voteAverage: json["vote_average"] ,
+      voteAverage: double.tryParse(json["vote_average"].toString()) ?? 0.0,
     );
   }
 
@@ -56,7 +56,7 @@ class Movie {
   factory Movie.cacheMovieToMovie(MovieCacheModel cacheMovie) {
     return Movie(
       title: cacheMovie.title,
-      id: cacheMovie.id,
+      id: cacheMovie.modelId,
       backDropPath: cacheMovie.backDropPath,
       originalTitle: cacheMovie.originalTitle,
       overview: cacheMovie.overview,

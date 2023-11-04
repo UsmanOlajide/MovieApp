@@ -29,7 +29,7 @@ class MovieCacheModel {
   late String overview;
   late String posterPath;
   late String releaseDate;
-  late int voteAverage;
+  late double voteAverage;
 
 // a factory method to convert a normal movie object to a movieCacheModel object when needed
   // factory MovieCacheModel.toCache(Movie movie) {
@@ -42,7 +42,7 @@ class MovieCacheModel {
       overview: movie.overview,
       posterPath: movie.posterPath,
       releaseDate: movie.releaseDate,
-      voteAverage: movie.voteAverage.toInt(),
+      voteAverage: movie.voteAverage,
       // voteAverage: int.tryParse(movie.voteAverage.toString()) ?? 66,
     );
   }

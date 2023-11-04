@@ -1,14 +1,16 @@
-import 'package:cineverse/constants.dart';
-
-import 'package:cineverse/screens/movie_details_screen.dart';
 import 'package:cineverse/services/cache_service.dart';
-import 'package:cineverse/widgets/favorite_movies.dart';
+import 'package:cineverse/widgets/favorited_movie.dart';
 
 import 'package:flutter/material.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +21,7 @@ class FavoritesScreen extends StatelessWidget {
       ),
       body: FutureBuilder(
         future: CacheServices().fetchFavourites(),
+        initialData: CacheServices().movies,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -26,8 +29,21 @@ class FavoritesScreen extends StatelessWidget {
             );
           }
           if (snapshot.hasData) {
-            print(snapshot.data![0].voteAverage);
-            return FavoriteMovies(snapshot: snapshot);
+            final movies = snapshot.data!;
+            if (movies.isEmpty) {
+              return const Center(
+                child: Text('Nothing to show here'),
+              );
+            }
+            return ListView.builder(
+              itemCount: movies.length,
+              itemBuilder: (_, i) {
+                return FavoritedMovie(
+                  movie: movies[i],
+                  onPopped: () => setState(() {}),
+                );
+              },
+            );
           }
           return const Center(
             child: Text('loading...'),
@@ -37,6 +53,17 @@ class FavoritesScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
 
   //  if (snapshot.hasData) {
   //           final movies = snapshot.data!;

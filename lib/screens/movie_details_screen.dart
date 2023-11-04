@@ -44,8 +44,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
               IconButton(
                 onPressed: () async {
                   await CacheServices().toggleFavourite(widget.movie);
-
-                  // print('added');
                   setState(() {});
                 },
                 icon: FutureBuilder(
@@ -53,6 +51,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   builder: (_, snapshot) {
                     if (snapshot.hasData) {
                       final isFavorited = snapshot.data!;
+                      print(isFavorited);
                       if (isFavorited) {
                         return const Icon(
                           Icons.star,
@@ -115,7 +114,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               color: Colors.yellow,
                             ),
                             Text(
-                              '${widget.movie.voteAverage.toInt()}/10',
+                              '${widget.movie.voteAverage.toStringAsFixed(1)}/10',
                               style: const TextStyle(
                                   fontSize: 25, fontWeight: FontWeight.w500),
                               softWrap: true,
